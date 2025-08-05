@@ -1,7 +1,7 @@
 import imdb_anatomy
 
 # 0 Get the dataset
-df = imdb_anatomy.get_imdb_dataset("train")
+df = imdb_anatomy.get_imdb_dataset_as_df("train")
 
 # 1 Review-length distribution
 imdb_anatomy.length_distribution(df)

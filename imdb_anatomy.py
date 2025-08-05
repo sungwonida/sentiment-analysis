@@ -33,7 +33,7 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 # Dataset helpers
 # ---------------------------------------------------------------------------
 
-def get_imdb_dataset(phase: str) -> pd.DataFrame:
+def get_imdb_dataset_as_df(phase: str) -> pd.DataFrame:
     """Return the requested IMDb split as a *pandas* :class:`DataFrame`.
 
     Parameters
