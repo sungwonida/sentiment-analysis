@@ -214,3 +214,7 @@ def vocab_size_oov_rate(df: pd.DataFrame) -> None:
     df["n_truncated"] = (df["tok_len"] - max_len).clip(lower=0)
     avg_trunc = df.loc[df.n_truncated > 0, "n_truncated"].mean()
     print(f"Average tokens truncated per long review: {avg_trunc:.2f}")
+
+    df["n_out_of_vocab"] = df["text"].apply(
+        lambda t: sum(1 for tok_id in tok(t)["input_ids"] if tok_id == tok.unk_token_id))
+    print("Average unknown tokens per review:", df["n_out_of_vocab"].mean())
