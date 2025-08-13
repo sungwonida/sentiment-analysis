@@ -58,7 +58,7 @@ def get_imdb_dataset_as_df(phase: str) -> pd.DataFrame:
     print("get_imdb_dataset  ▶  Loading IMDb reviews into a DataFrame …")
     print("---------------------------------------------------------------")
 
-    valid_phases = {"train", "test"}
+    valid_phases = {"train", "test", "unsupervised"}
     if phase not in valid_phases:
         raise ValueError(f"phase must be one of {valid_phases}, got {phase!r}")
 
@@ -218,3 +218,20 @@ def vocab_size_oov_rate(df: pd.DataFrame) -> None:
     df["n_out_of_vocab"] = df["text"].apply(
         lambda t: sum(1 for tok_id in tok(t)["input_ids"] if tok_id == tok.unk_token_id))
     print("Average unknown tokens per review:", df["n_out_of_vocab"].mean())
+
+
+# ---------------------------------------------------------------------------
+# Statistical tests
+# ---------------------------------------------------------------------------
+
+def sentiment_review_length(df: pd.DataFrame) -> None:
+    """Run an independent t‑test on review lengths across sentiment classes."""
+    print("\n---------------------------------------------------------------")
+    print("sentiment_review_length  ▶  Running t‑test on length vs sentiment …")
+    print("---------------------------------------------------------------")
+
+    stat, p = st.ttest_ind(
+        df[df["label"] == 0]["length"],
+        df[df["label"] == 1]["length"],
+    )
+    print(f"T‑test statistic: {stat:.4f}; p‑value: {p:.4f}")
