@@ -1,3 +1,7 @@
 __pycache__
 *.pyc
 results*
+checkpoints
+runs
+*.log
+.DS_Store
