@@ -1,1 +1,1 @@
-from .lora_bert_meanpool_clsv2 import LoRA_BERT_MeanPoolClsV2
+from .lora_bert_meanpool_clsv2 import LoRA_BERT_MeanPoolClsV2, LoRA_BERT_MeanPoolClsV2_Integrated

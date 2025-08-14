@@ -59,3 +59,44 @@ class LoRA_BERT_MeanPoolClsV2(nn.Module):
             loss = nn.functional.cross_entropy(logits, labels)
 
         return {"loss": loss, "logits": logits}
+
+
+class LoRA_BERT_MeanPoolClsV2_Integrated(nn.Module):
+    def __init__(self, num_labels = 2, from_pretrained = None):
+        super().__init__()
+
+        self.bert = AutoModel.from_pretrained("bert-base-uncased")
+
+        self.bert.classifier = nn.Sequential(
+            nn.Linear(self.bert.config.hidden_size, 256),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(256, num_labels),
+        )
+
+        if from_pretrained is not None:
+            assert isinstance(from_pretrained, str)
+            self.bert = PeftModel.from_pretrained(self.bert, from_pretrained)
+        else:
+            lora_cfg = LoraConfig(
+                r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
+                task_type=TaskType.FEATURE_EXTRACTION,  # Don’t try to treat the base as a classifier. Just keep BERT’s forward semantics as a feature extractor. Because we are using `AutoModel` with a custom loss path.
+                target_modules=["query", "key", "value"],
+                modules_to_save=["classifier"],
+            )
+
+            self.bert = get_peft_model(self.bert, lora_cfg)
+
+        assert hasattr(self.bert, "classifier")
+        self.bert.print_trainable_parameters()  # sanity check
+
+    def forward(self, input_ids=None, attention_mask=None, labels=None):
+        out = self.bert(input_ids=input_ids, attention_mask=attention_mask, return_dict=True)
+        pooled = out.last_hidden_state.mean(dim=1)
+        logits = self.bert.classifier(pooled)
+        loss = None
+
+        if labels is not None:
+            loss = nn.functional.cross_entropy(logits, labels)
+
+        return {"loss": loss, "logits": logits}
