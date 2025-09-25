@@ -1,7 +1,8 @@
 __pycache__
 *.pyc
-results*
-checkpoints
-runs
+results/
+artifacts/
+checkpoints/
+runs/
 *.log
 .DS_Store
